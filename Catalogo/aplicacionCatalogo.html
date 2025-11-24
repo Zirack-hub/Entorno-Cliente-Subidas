@@ -13,7 +13,6 @@
         padding: 0;
         text-align: center;
       }
-
       h1 {
         color: #ffa76d;
         margin-top: 25px;
@@ -21,7 +20,6 @@
         font-family: "Courier New", monospace;
         letter-spacing: 1px;
       }
-
       #aparecerFormulario {
         background-color: #ffa76d;
         color: #000000;
@@ -34,11 +32,9 @@
         transition: 0.25s;
         margin-top: 10px;
       }
-
       #aparecerFormulario:hover {
         background-color: #f5f5f5;
       }
-
       #formulario {
         display: none;
         width: 25%;
@@ -52,7 +48,6 @@
         align-items: center;
         gap: 5px;
       }
-
       .input {
         background-color: #3c3c3c;
         border: 2px solid #ffa76d;
@@ -63,7 +58,12 @@
         font-size: 14px;
         margin-bottom: 8px;
       }
-
+      input::placeholder {
+        color: red;
+      }
+      .input-error {
+        border: 2px solid red !important;
+      }
       #productos label {
         text-align: left;
         font-size: 14px;
@@ -71,13 +71,11 @@
         color: #ffa76d;
         display: block;
       }
-
       .input:focus {
         outline: none;
         border-color: #f5f5f5;
         box-shadow: 0 0 6px #ffa76d;
       }
-
       #agregar {
         background-color: #ffa76d;
         color: #000000;
@@ -90,11 +88,9 @@
         transition: 0.25s;
         margin-top: 10px;
       }
-
       #agregar:hover {
         background-color: #f5f5f5;
       }
-
       #contenedorPrincipal {
         display: flex;
         justify-content: space-between;
@@ -104,18 +100,15 @@
         margin-top: 30px;
         gap: 30px;
       }
-
       #tablaProductos {
         flex-grow: 1;
       }
-
       .grid-productos {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 20px;
         padding: 20px;
       }
-
       .item {
         background-color: #1a1a1a;
         padding: 10px;
@@ -123,12 +116,10 @@
         box-shadow: 0 0 12px rgba(255, 167, 109, 0.18);
         transition: transform 0.25s ease, box-shadow 0.25s ease;
       }
-
       .item:hover {
         transform: translateY(-5px);
         box-shadow: 0 0 20px rgba(255, 167, 109, 0.35);
       }
-
       .grid-productos img {
         width: 100%;
         height: 160px;
@@ -145,18 +136,15 @@
       <div id="tablaProductos"></div>
     </div>
     <div id="mostrarInformacionProducto"></div>
-
     <script>
       let productos = [];
       let cantidad = 0;
-
       const tablaProductos = document.getElementById("tablaProductos");
       const formulario = document.getElementById("formulario");
       const mostrarInformacionProducto = document.getElementById(
         "mostrarInformacionProducto"
       );
       const aparecerFormulario = document.getElementById("aparecerFormulario");
-
       function generarInformacionProductos() {
         for (let producto of productos) {
           const img = document.getElementById("img-" + producto.id);
@@ -172,7 +160,6 @@
           }
         }
       }
-
       function mostrarInformacion(nombre, id, precio, descripcion) {
         alert(
           "nombre = " +
@@ -185,9 +172,7 @@
             descripcion
         );
       }
-
       aparecerFormulario.addEventListener("click", mostrarFormulario);
-
       function mostrarFormulario() {
         formulario.style.display = "block";
         formulario.innerHTML = `
@@ -205,28 +190,39 @@
                     <button id="agregar" type="button">Agregar Producto</button>
                 </form>
             `;
-
         const agregar = document.getElementById("agregar");
-
         agregar.addEventListener("click", () => {
-          const nombre = document.getElementById("nombre").value;
-          const descripcion = document.getElementById("descripcion").value;
-          const precio = document.getElementById("precio").value;
-          const imagen = document.getElementById("imagen").files[0];
-
-          if (!imagen) {
-            alert("Debes seleccionar una imagen");
+          const id_elemento = document.getElementById("id");
+          const nombre_elemento = document.getElementById("nombre");
+          const descripcion_elemento = document.getElementById("descripcion");
+          const precio_elemento = document.getElementById("precio");
+          const imagen_elemento = document.getElementById("imagen");
+          let id = id_elemento.value;
+          const nombre = nombre_elemento.value;
+          const descripcion = descripcion_elemento.value;
+          const precio = precio_elemento.value;
+          const imagen = imagen_elemento.files[0];
+          const error = comprobarDatos(
+            id,
+            id_elemento,
+            nombre,
+            nombre_elemento,
+            descripcion,
+            descripcion_elemento,
+            precio,
+            precio_elemento,
+            imagen,
+            imagen_elemento
+          );
+          if (error) {
             return;
-          }
-
-          const urlImagen = URL.createObjectURL(imagen);
-          const error = comprobarDatos(nombre, descripcion, precio);
-
-          if (error !== "") {
-            alert(error);
           } else {
+            const urlImagen = URL.createObjectURL(imagen);
+            if (!id) {
+              id = String(cantidad++);
+            }
             const producto = {
-              id: cantidad++,
+              id,
               nombre,
               descripcion,
               precio,
@@ -234,26 +230,60 @@
             };
             productos.push(producto);
           }
-
           if (productos.length > 0) {
             mostrarTabla();
             formulario.style.display = "none";
           }
         });
       }
-
-      function comprobarDatos(nombre, descripcion, precio) {
-        let error = "";
-        if (nombre === "") error += "Nombre es un campo necesario\n";
-        if (descripcion === "") error += "Descripción es un campo necesario\n";
-        if (precio === "") error += "Precio es un campo necesario\n";
+      function comprobarDatos(
+        id,
+        id_elemento,
+        nombre,
+        nombre_elemento,
+        descripcion,
+        descripcion_elemento,
+        precio,
+        precio_elemento,
+        imagen,
+        imagen_elemento
+      ) {
+        let error = false;
+        for (let producto of productos) {
+          if (id === producto.id) {
+            error = true;
+            mostrarError(id_elemento, "Id duplicada, ingrese una id diferente");
+          }
+        }
+        if (!nombre) {
+          error = true;
+          mostrarError(nombre_elemento, "Nombre es un campo obligatorio");
+        }
+        if (!descripcion) {
+          error = true;
+          mostrarError(
+            descripcion_elemento,
+            "Descripción es un campo obligatorio"
+          );
+        }
+        if (!precio) {
+          error = true;
+          mostrarError(precio_elemento, "Precio es un campo obligatorio");
+        }
+        if (!imagen) {
+          error = true;
+          mostrarError(imagen_elemento, "Imagen es un campo obligatorio");
+        }
         return error;
       }
-
+      function mostrarError(elemento, error) {
+        elemento.classList.add("input-error");
+        elemento.value = "";
+        elemento.placeholder = error;
+      }
       function mostrarTabla() {
         tablaProductos.innerHTML = "";
         let tabla = `<div class="grid-productos">`;
-
         for (let producto of productos) {
           tabla += `
                     <div class="item">
@@ -261,7 +291,6 @@
                     </div>
                 `;
         }
-
         tabla += `</div>`;
         tablaProductos.innerHTML = tabla;
         generarInformacionProductos();
