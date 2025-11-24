@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aplicación para productos</title>
+    <style>
+      body {
+        background-color: #000000;
+        font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+        color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+
+      h1 {
+        color: #ffa76d;
+        margin-top: 25px;
+        margin-bottom: 25px;
+        font-family: "Courier New", monospace;
+        letter-spacing: 1px;
+      }
+
+      #aparecerFormulario {
+        background-color: #ffa76d;
+        color: #000000;
+        border: none;
+        padding: 10px 26px;
+        font-size: 16px;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.25s;
+        margin-top: 10px;
+      }
+
+      #aparecerFormulario:hover {
+        background-color: #f5f5f5;
+      }
+
+      #formulario {
+        display: none;
+        width: 25%;
+        min-width: 250px;
+        margin: 0;
+        padding: 25px 30px;
+        background-color: #1a1a1a;
+        border-radius: 14px;
+        box-shadow: 0 0 18px rgba(204, 198, 193, 0.22);
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .input {
+        background-color: #3c3c3c;
+        border: 2px solid #ffa76d;
+        color: #f5f5f5;
+        padding: 6px 8px;
+        width: 250px;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+
+      #productos label {
+        text-align: left;
+        font-size: 14px;
+        margin-bottom: 2px;
+        color: #ffa76d;
+        display: block;
+      }
+
+      .input:focus {
+        outline: none;
+        border-color: #f5f5f5;
+        box-shadow: 0 0 6px #ffa76d;
+      }
+
+      #agregar {
+        background-color: #ffa76d;
+        color: #000000;
+        border: none;
+        padding: 10px 26px;
+        font-size: 16px;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.25s;
+        margin-top: 10px;
+      }
+
+      #agregar:hover {
+        background-color: #f5f5f5;
+      }
+
+      #contenedorPrincipal {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 95%;
+        margin: auto;
+        margin-top: 30px;
+        gap: 30px;
+      }
+
+      #tablaProductos {
+        flex-grow: 1;
+      }
+
+      .grid-productos {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .item {
+        background-color: #1a1a1a;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(255, 167, 109, 0.18);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 20px rgba(255, 167, 109, 0.35);
+      }
+
+      .grid-productos img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Catálogo para productos</h1>
+    <button id="aparecerFormulario" type="button">Añadir Producto</button>
+    <div id="contenedorPrincipal">
+      <div id="formulario"></div>
+      <div id="tablaProductos"></div>
+    </div>
+    <div id="mostrarInformacionProducto"></div>
+
+    <script>
+      let productos = [];
+      let cantidad = 0;
+
+      const tablaProductos = document.getElementById("tablaProductos");
+      const formulario = document.getElementById("formulario");
+      const mostrarInformacionProducto = document.getElementById(
+        "mostrarInformacionProducto"
+      );
+      const aparecerFormulario = document.getElementById("aparecerFormulario");
+
+      function generarInformacionProductos() {
+        for (let producto of productos) {
+          const img = document.getElementById("img-" + producto.id);
+          if (img) {
+            img.addEventListener("click", () => {
+              mostrarInformacion(
+                producto.nombre,
+                producto.id,
+                producto.precio,
+                producto.descripcion
+              );
+            });
+          }
+        }
+      }
+
+      function mostrarInformacion(nombre, id, precio, descripcion) {
+        alert(
+          "nombre = " +
+            nombre +
+            " id = " +
+            id +
+            " precio = " +
+            precio +
+            " descripcion = " +
+            descripcion
+        );
+      }
+
+      aparecerFormulario.addEventListener("click", mostrarFormulario);
+
+      function mostrarFormulario() {
+        formulario.style.display = "block";
+        formulario.innerHTML = `
+                <form id="productos">
+                    <label for="id">ID:</label>
+                    <input class="input" id="id" type="text">
+                    <label for="nombre">Nombre:</label>
+                    <input class="input" id="nombre" type="text">
+                    <label for="descripcion">Descripcion:</label>
+                    <input class="input" id="descripcion" type="text">
+                    <label for="precio">Precio:</label>
+                    <input class="input" id="precio" type="number">
+                    <label for="imagen">Imagen:</label>
+                    <input class="input" id="imagen" type="file">
+                    <button id="agregar" type="button">Agregar Producto</button>
+                </form>
+            `;
+
+        const agregar = document.getElementById("agregar");
+
+        agregar.addEventListener("click", () => {
+          const nombre = document.getElementById("nombre").value;
+          const descripcion = document.getElementById("descripcion").value;
+          const precio = document.getElementById("precio").value;
+          const imagen = document.getElementById("imagen").files[0];
+
+          if (!imagen) {
+            alert("Debes seleccionar una imagen");
+            return;
+          }
+
+          const urlImagen = URL.createObjectURL(imagen);
+          const error = comprobarDatos(nombre, descripcion, precio);
+
+          if (error !== "") {
+            alert(error);
+          } else {
+            const producto = {
+              id: cantidad++,
+              nombre,
+              descripcion,
+              precio,
+              imagen: urlImagen,
+            };
+            productos.push(producto);
+          }
+
+          if (productos.length > 0) {
+            mostrarTabla();
+            formulario.style.display = "none";
+          }
+        });
+      }
+
+      function comprobarDatos(nombre, descripcion, precio) {
+        let error = "";
+        if (nombre === "") error += "Nombre es un campo necesario\n";
+        if (descripcion === "") error += "Descripción es un campo necesario\n";
+        if (precio === "") error += "Precio es un campo necesario\n";
+        return error;
+      }
+
+      function mostrarTabla() {
+        tablaProductos.innerHTML = "";
+        let tabla = `<div class="grid-productos">`;
+
+        for (let producto of productos) {
+          tabla += `
+                    <div class="item">
+                        <img src="${producto.imagen}" id="img-${producto.id}" alt="${producto.nombre}">
+                    </div>
+                `;
+        }
+
+        tabla += `</div>`;
+        tablaProductos.innerHTML = tabla;
+        generarInformacionProductos();
+      }
+    </script>
+  </body>
+</html>
